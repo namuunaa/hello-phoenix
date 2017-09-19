@@ -13,6 +13,12 @@ defmodule Hello.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/api", Hello do
+    pipe_through :api
+
+    resources "/contacts", ContactController, only: [:index]
+  end
+  
   scope "/", Hello do
     pipe_through :browser # Use the default browser stack
 
@@ -20,7 +26,4 @@ defmodule Hello.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", Hello do
-  #   pipe_through :api
-  # end
 end
