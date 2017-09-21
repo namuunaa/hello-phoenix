@@ -5,17 +5,41 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Messages exposing (..)
 import Model exposing (..)
+import Html.Events exposing(onClick)
 
 
 indexView : Model -> Html Msg
 indexView model =
   div
     [ id "home_index" ]
-    [ div
+    [ paginationList model.contactList.total_pages model.contactList.page_number
+    , div
         []
         [ contactsList model ]
+    , paginationList model.contactList.total_pages model.contactList.page_number
     ]
 
+paginationList : Int -> Int -> Html Msg
+paginationList totalPages pageNumber =
+    List.range 1 totalPages
+        |> List.map (paginationLink pageNumber)
+        |> ul [ class "pagination" ]
+
+
+paginationLink : Int -> Int -> Html Msg
+paginationLink currentPage page =
+    let
+        classes =
+            classList [ ( "active", currentPage == page ) ]
+    in
+        li
+            []
+            [ a
+                [ classes 
+                , onClick <| Paginate page
+                ]
+                []
+            ]
 
 contactsList : Model -> Html Msg
 contactsList model =

@@ -60,6 +60,10 @@ exports.config = {
       elmFolder: 'web/elm',
       mainModules: ['Main.elm'],
       outputFolder: '../static/js',
+      makeParameters: ['--debug']
+    },
+    stylus: {
+      plugins: ['nib']
     }
   },
 
