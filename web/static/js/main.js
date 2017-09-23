@@ -13336,10 +13336,10 @@ var _user$project$Model$initialContactList = {
 	total_entries: 0,
 	total_pages: 0
 };
-var _user$project$Model$initialModel = {contactList: _user$project$Model$initialContactList, error: _elm_lang$core$Maybe$Nothing};
-var _user$project$Model$Model = F2(
-	function (a, b) {
-		return {contactList: a, error: b};
+var _user$project$Model$initialModel = {contactList: _user$project$Model$initialContactList, error: _elm_lang$core$Maybe$Nothing, search: ''};
+var _user$project$Model$Model = F3(
+	function (a, b, c) {
+		return {contactList: a, error: b, search: c};
 	});
 var _user$project$Model$ContactList = F4(
 	function (a, b, c, d) {
@@ -13415,6 +13415,10 @@ var _user$project$Decoders$contactListDecoder = A2(
 		A2(_elm_lang$core$Json_Decode$field, 'total_entries', _elm_lang$core$Json_Decode$int)),
 	A2(_elm_lang$core$Json_Decode$field, 'total_pages', _elm_lang$core$Json_Decode$int));
 
+var _user$project$Messages$HandleFormSubmit = {ctor: 'HandleFormSubmit'};
+var _user$project$Messages$HandleSearchInput = function (a) {
+	return {ctor: 'HandleSearchInput', _0: a};
+};
 var _user$project$Messages$Paginate = function (a) {
 	return {ctor: 'Paginate', _0: a};
 };
@@ -13422,14 +13426,18 @@ var _user$project$Messages$FetchResult = function (a) {
 	return {ctor: 'FetchResult', _0: a};
 };
 
-var _user$project$Commands$fetch = function (page) {
-	var apiUrl = A2(
-		_elm_lang$core$Basics_ops['++'],
-		'/api/contacts?page=',
-		_elm_lang$core$Basics$toString(page));
-	var request = A2(_elm_lang$http$Http$get, apiUrl, _user$project$Decoders$contactListDecoder);
-	return A2(_elm_lang$http$Http$send, _user$project$Messages$FetchResult, request);
-};
+var _user$project$Commands$fetch = F2(
+	function (page, search) {
+		var apiUrl = A2(
+			_elm_lang$core$Basics_ops['++'],
+			'/api/contacts?page=',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(page),
+				A2(_elm_lang$core$Basics_ops['++'], '&search=', search)));
+		var request = A2(_elm_lang$http$Http$get, apiUrl, _user$project$Decoders$contactListDecoder);
+		return A2(_elm_lang$http$Http$send, _user$project$Messages$FetchResult, request);
+	});
 
 var _user$project$Contact_View$contactView = function (model) {
 	var fullName = A2(
@@ -13677,6 +13685,92 @@ var _user$project$Contact_View$contactView = function (model) {
 		});
 };
 
+var _user$project$ContactList_View$searchSection = function (model) {
+	var totalEntries = model.contactList.total_entries;
+	var contactWord = _elm_lang$core$Native_Utils.eq(totalEntries, 1) ? 'contact' : 'contacts';
+	var headerText = _elm_lang$core$Native_Utils.eq(totalEntries, 0) ? '' : A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString(totalEntries),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			' ',
+			A2(_elm_lang$core$Basics_ops['++'], contactWord, ' found')));
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('filter-wrapper'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('overview-wrapper'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h3,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(headerText),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('form-wrapper'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$form,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onSubmit(_user$project$Messages$HandleFormSubmit),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$type_('search'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$placeholder('Search contacts...'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$value(model.search),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onInput(_user$project$Messages$HandleSearchInput),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$ContactList_View$contactsList = function (model) {
 	if (_elm_lang$core$Native_Utils.cmp(model.contactList.total_entries, 0) > 0) {
 		return A2(
@@ -13794,21 +13888,25 @@ var _user$project$ContactList_View$indexView = function (model) {
 		},
 		{
 			ctor: '::',
-			_0: A2(_user$project$ContactList_View$paginationList, model.contactList.total_pages, model.contactList.page_number),
+			_0: _user$project$ContactList_View$searchSection(model),
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _user$project$ContactList_View$contactsList(model),
-						_1: {ctor: '[]'}
-					}),
+				_0: A2(_user$project$ContactList_View$paginationList, model.contactList.total_pages, model.contactList.page_number),
 				_1: {
 					ctor: '::',
-					_0: A2(_user$project$ContactList_View$paginationList, model.contactList.total_pages, model.contactList.page_number),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _user$project$ContactList_View$contactsList(model),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(_user$project$ContactList_View$paginationList, model.contactList.total_pages, model.contactList.page_number),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
@@ -13817,33 +13915,50 @@ var _user$project$ContactList_View$indexView = function (model) {
 var _user$project$Update$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
-		if (_p0.ctor === 'FetchResult') {
-			if (_p0._0.ctor === 'Ok') {
+		switch (_p0.ctor) {
+			case 'FetchResult':
+				if (_p0._0.ctor === 'Ok') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{contactList: _p0._0._0}),
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								error: _elm_lang$core$Maybe$Just('Something went wrong...')
+							}),
+						{ctor: '[]'});
+				}
+			case 'Paginate':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{
+						ctor: '::',
+						_0: A2(_user$project$Commands$fetch, _p0._0, model.search),
+						_1: {ctor: '[]'}
+					});
+			case 'HandleSearchInput':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{contactList: _p0._0._0}),
+						{search: _p0._0}),
 					{ctor: '[]'});
-			} else {
+			default:
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							error: _elm_lang$core$Maybe$Just('Something went wrong...')
-						}),
-					{ctor: '[]'});
-			}
-		} else {
-			return A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				model,
-				{
-					ctor: '::',
-					_0: _user$project$Commands$fetch(_p0._0),
-					_1: {ctor: '[]'}
-				});
+					model,
+					{
+						ctor: '::',
+						_0: A2(_user$project$Commands$fetch, 1, model.search),
+						_1: {ctor: '[]'}
+					});
 		}
 	});
 
@@ -13893,7 +14008,7 @@ var _user$project$Main$init = A2(
 	_user$project$Model$initialModel,
 	{
 		ctor: '::',
-		_0: _user$project$Commands$fetch(1),
+		_0: A2(_user$project$Commands$fetch, 1, ''),
 		_1: {ctor: '[]'}
 	});
 var _user$project$Main$main = _elm_lang$html$Html$program(
@@ -13907,7 +14022,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Messages.Msg":{"args":[],"tags":{"FetchResult":["Result.Result Http.Error Model.ContactList"],"Paginate":["Int"]}},"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}}},"aliases":{"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Model.ContactList":{"args":[],"type":"{ entries : List Model.Contact , page_number : Int , total_entries : Int , total_pages : Int }"},"Model.Contact":{"args":[],"type":"{ id : Int , first_name : String , last_name : String , gender : Int , birth_date : String , location : String , phone_number : String , email : String , headline : String , picture : String }"}},"message":"Messages.Msg"},"versions":{"elm":"0.18.0"}});
+    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Messages.Msg":{"args":[],"tags":{"FetchResult":["Result.Result Http.Error Model.ContactList"],"HandleSearchInput":["String"],"HandleFormSubmit":[],"Paginate":["Int"]}},"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}}},"aliases":{"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Model.ContactList":{"args":[],"type":"{ entries : List Model.Contact , page_number : Int , total_entries : Int , total_pages : Int }"},"Model.Contact":{"args":[],"type":"{ id : Int , first_name : String , last_name : String , gender : Int , birth_date : String , location : String , phone_number : String , email : String , headline : String , picture : String }"}},"message":"Messages.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])
