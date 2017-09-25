@@ -1,9 +1,15 @@
 module Model exposing (..)
 
 
+type RemoteData e a
+    = NotRequested
+    | Requesting
+    | Failure e
+    | Success a
+
+    
 type alias Model =
-  { contactList : ContactList
-  , error : Maybe String
+  { contactList : RemoteData String ContactList
   , search : String
   }
 
@@ -29,6 +35,7 @@ type alias Contact =
   , picture : String
   }
 
+
 initialContactList : ContactList
 initialContactList =
   { entries = []
@@ -40,7 +47,8 @@ initialContactList =
 
 initialModel : Model
 initialModel =
-  { contactList = initialContactList
-  , error = Nothing
+  { contactList = NotRequested
   , search = ""
-  }
+  } 
+
+
