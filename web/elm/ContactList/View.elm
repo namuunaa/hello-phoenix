@@ -1,6 +1,7 @@
 module ContactList.View exposing (indexView)
 
 import Contact.View exposing (contactView)
+import Common.View exposing (warningMessage)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Messages exposing (..)
@@ -152,16 +153,3 @@ paginationLink currentPage page =
             ]
         )
 
-
-warningMessage : String -> String -> Html Msg -> Html Msg
-warningMessage iconClasses message content =
-    div
-        [ class "warning" ]
-        [ span
-            [ class "fa-stack" ]
-            [ i [ class iconClasses ] [] ]
-        , h4
-            []
-            [ text message ]
-        , content
-        ]
