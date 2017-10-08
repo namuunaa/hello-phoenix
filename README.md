@@ -1,3 +1,7 @@
+# Disclaimer
+
+Learning Phoenix following [this](http://codeloveandboards.com/blog/2017/02/02/phoenix-and-elm-a-real-use-case-pt-1/) tutorial
+
 # Hello
 
 To start your Phoenix app:
@@ -18,3 +22,4 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
   * Docs: https://hexdocs.pm/phoenix
   * Mailing list: http://groups.google.com/group/phoenix-talk
   * Source: https://github.com/phoenixframework/phoenix
+
